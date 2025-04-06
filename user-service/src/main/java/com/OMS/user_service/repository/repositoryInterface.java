@@ -1,28 +1,28 @@
 package com.OMS.user_service.repository;
 
 import com.OMS.user_service.model.user;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@Mapper
 public interface repositoryInterface {
 
-    @Insert("INSERT INTO user (name, id, grade) VALUES (#{name}, #{id}, #{grade})")
+    @Insert("INSERT INTO userinfo (name, id, grade) VALUES (#{name}, #{id}, #{grade})")
     void insertUser(user user);
 
-    @Delete("DELETE FROM user WHERE id = #{id}")
-    void deleteUser(int id);
+    @Delete("DELETE FROM userinfo WHERE id = #{id}")
+    void deleteUserById(String id);
+
+    @Delete("DELETE FROM userinfo WHERE name = #{name}")
+    void deleteUserByName(String name);
 
     @Update("UPDATE user SET name = #{name}, grade = #{grade} WHERE id = #{id}")
-    void updateUser(user user);
+    void updateUser(user userinfo);
 
-    @Select("SELECT * FROM user WHERE id = #{id}")
-    user getUserById(int id);
+    @Select("SELECT * FROM userinfo WHERE id = #{id}")
+    user getUserById(String id);
 
-    @Select("SELECT * FROM user WHERE name = #{name}")
+    @Select("SELECT * FROM userinfo WHERE name = #{name}")
     user getUserByName(String name);
-
-    @Select("SELECT * FROM user WHERE grade = #{grade}")
-    user getUserByGrade(String grade);
 }

@@ -12,4 +12,10 @@ public class user {
 //    private String status;
     private String id;
     private String grade;
+
+    public user(String name, String id, String grade) {
+        this.name = name;
+        this.id = id;
+        this.grade = grade;
+    }
 }

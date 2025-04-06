@@ -1,6 +1,7 @@
 package com.OMS.user_service.service;
 
 import com.OMS.user_service.model.user;
+import org.springframework.stereotype.Service;
 
 public interface serviceInterface {
 
