@@ -5,15 +5,25 @@ import org.springframework.stereotype.Service;
 
 public interface serviceInterface {
 
-    String insertUserService(String name, String id, String grade);
+    // user information
 
-    String deleteUserByIdService(String id);
+    String insertUserInfoService(String name, String id, String grade);
 
-    String deleteUserByNameService(String name);
+    String deleteUserInfoByIdService(String id);
 
-    String updateUserService(String id, String name, String grade);
+    String deleteUserInfoByNameService(String name);
 
-    user getAllByIdService(String id);
+    String updateUserInfoService(String id, String name, String grade);
 
-    user getAllByNameService(String name);
+    user getUserInfoByIdService(String id);
+
+    user getUserInfoByNameService(String name);
+
+    // score information
+
+    String getScoreByIdService(String id);
+
+    String getScoreByNameService(String name);
+
+    String getAverageScoreService();
 }

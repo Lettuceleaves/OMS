@@ -9,20 +9,20 @@ import org.springframework.stereotype.Repository;
 public interface repositoryInterface {
 
     @Insert("INSERT INTO userinfo (name, id, grade) VALUES (#{name}, #{id}, #{grade})")
-    void insertUser(user user);
+    void insertUserInfoData(user user);
 
     @Delete("DELETE FROM userinfo WHERE id = #{id}")
-    void deleteUserById(String id);
+    void deleteUserInfoDataById(String id);
 
     @Delete("DELETE FROM userinfo WHERE name = #{name}")
-    void deleteUserByName(String name);
+    void deleteUserInfoDataByName(String name);
 
     @Update("UPDATE user SET name = #{name}, grade = #{grade} WHERE id = #{id}")
-    void updateUser(user userinfo);
+    void updateUserInfoData(String id, String name, String grade);
 
     @Select("SELECT * FROM userinfo WHERE id = #{id}")
-    user getUserById(String id);
+    user getUserInfoDataById(String id);
 
     @Select("SELECT * FROM userinfo WHERE name = #{name}")
-    user getUserByName(String name);
+    user getUserInfoDataByName(String name);
 }

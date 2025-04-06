@@ -21,6 +21,7 @@ public class controllerApplication {
     @GetMapping("/userInfo/allById/{id}")
     public user getUserInfoById(@PathVariable("id") String id) {
         // Logic to get user info by
-        return service.getAllByIdService(id);
+        return service.getUserInfoByNameService(id);
     }
+
 }
