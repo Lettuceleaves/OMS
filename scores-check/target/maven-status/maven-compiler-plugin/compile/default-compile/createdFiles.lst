@@ -1,1 +1,6 @@
-org\example\scorescheck\ScoresCheckApplication.class
+com\OMS\score_check\scoresCheckApplication.class
+com\OMS\score_check\service\serviceApplication.class
+com\OMS\score_check\controller\clientScoreInterface.class
+com\OMS\score_check\controller\controllerApplication.class
+com\OMS\score_check\repository\repositoryInterface.class
+com\OMS\score_check\service\serviceInterface.class

@@ -1,1 +1,6 @@
-E:\projects\OMS\scores-check\src\main\java\org\example\scorescheck\ScoresCheckApplication.java
+E:\projects\OMS\scores-check\src\main\java\com\OMS\score_check\controller\clientScoreInterface.java
+E:\projects\OMS\scores-check\src\main\java\com\OMS\score_check\controller\controllerApplication.java
+E:\projects\OMS\scores-check\src\main\java\com\OMS\score_check\repository\repositoryInterface.java
+E:\projects\OMS\scores-check\src\main\java\com\OMS\score_check\scoresCheckApplication.java
+E:\projects\OMS\scores-check\src\main\java\com\OMS\score_check\service\serviceApplication.java
+E:\projects\OMS\scores-check\src\main\java\com\OMS\score_check\service\serviceInterface.java

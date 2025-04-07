@@ -1,1 +1,7 @@
+com\OMS\user_service\model\user.class
+com\OMS\user_service\client\clientScoreInterface.class
+com\OMS\user_service\repository\repositoryInterface.class
+com\OMS\user_service\controller\controllerApplication.class
+com\OMS\user_service\service\serviceApplication.class
+com\OMS\user_service\service\serviceInterface.class
 com\OMS\user_service\userServiceApplication.class
