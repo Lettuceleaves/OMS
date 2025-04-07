@@ -41,6 +41,7 @@ public class serviceApplication implements serviceInterface {
     }
 
     public user getUserInfoByIdService(String id) {
+        System.out.println(id);
         return repository.getUserInfoDataById(id);
     }
 

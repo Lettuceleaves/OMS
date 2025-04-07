@@ -10,6 +10,7 @@ public class serviceApplication implements serviceInterface {
     private repositoryInterface repository;
 
     public String getScoreByIdService(String id) {
+        System.out.println(id);
         return repository.getScoreById(id);
     }
 

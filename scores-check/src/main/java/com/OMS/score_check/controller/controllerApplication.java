@@ -8,25 +8,4 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class controllerApplication {
-
-    @Autowired
-    private serviceInterface service;
-
-    @GetMapping("/userInfo/scoreById/{id}")
-    String getScoreById(@PathVariable("id") String id) {
-        // Logic to get user info by id
-        return service.getScoreByIdService(id);
-    }
-
-    @GetMapping("/userInfo/scoreByName/{name}")
-    String getScoreByName(@PathVariable("name") String name) {
-        // Logic to get user info by name
-        return service.getScoreByNameService(name);
-    }
-
-    @GetMapping("/userInfo/averageScore")
-    String getAverageScore() {
-        // Logic to get user info by name
-        return service.getAverageScoreService();
-    }
 }
