@@ -1,3 +1,6 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: api-gateway
@@ -5,3 +8,21 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/userInfo/**
+        - id: scores-check
+          uri: lb://scores-check
+          predicates:
+            - Path=/scores/**
+        - id: ai-chat
+          uri: lb://ai-chat
+          predicates:
+            - Path=/ai/**
+logging:
+  level:
+    web: debug
+        

@@ -38,11 +38,7 @@ public class controllerApplication {
                 .stream()
                 .content()
                 .map(token -> {
-                    // 在这里可以对 token 进行处理，例如转换为字符串
-                    String processedToken = token.toString(); // 假设 token 已经是字符串，这里直接返回
-                    // 如果需要，可以在这里添加日志
-                    System.out.println("Processed token: " + processedToken + " at " + System.currentTimeMillis());
-                    return ServerSentEvent.<String>builder().data(processedToken).build();
+                    return ServerSentEvent.<String>builder().data(token).build();
                 });
     }
 }
