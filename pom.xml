@@ -25,6 +25,7 @@
         <module>scores-check</module>
         <module>api-gateway</module>
         <module>cloud-doc</module>
+        <module>ai-chat</module>
     </modules>
     <scm>
         <connection/>
