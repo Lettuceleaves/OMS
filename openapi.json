@@ -1,0 +1,300 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "API Documentation",
+    "version" : "1.0"
+  },
+  "paths" : {
+    "/hello" : {
+      "get" : {
+        "summary" : "hello",
+        "description" : "hello",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/userInfo/allById/{id}" : {
+      "get" : {
+        "summary" : "getUserInfoById",
+        "description" : "getUserInfoById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "name" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "id" : {
+                      "type" : "string",
+                      "description" : "private String email;"
+                    },
+                    "grade" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/userInfo/allByName/{name}" : {
+      "get" : {
+        "summary" : "getUserInfoByName",
+        "description" : "getUserInfoByName",
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "name" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "id" : {
+                      "type" : "string",
+                      "description" : "private String email;"
+                    },
+                    "grade" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/userInfo/scoreById/{id}" : {
+      "get" : {
+        "summary" : "getScoreById",
+        "description" : "getScoreById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/userInfo/scoreByName/{name}" : {
+      "get" : {
+        "summary" : "getScoreByName",
+        "description" : "getScoreByName",
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/userInfo/averageScore" : {
+      "get" : {
+        "summary" : "getAverageScore",
+        "description" : "getAverageScore",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/chat" : {
+      "get" : {
+        "summary" : "generate",
+        "description" : "generate",
+        "parameters" : [ {
+          "name" : "message",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false,
+            "default" : "Tell me a joke"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/fluxchat" : {
+      "get" : {
+        "summary" : "generateFlux",
+        "description" : "generateFlux",
+        "parameters" : [ {
+          "name" : "message",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false,
+            "default" : "Tell me a joke"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "id" : {
+                        "type" : "string",
+                        "description" : "",
+                        "nullable" : true
+                      },
+                      "event" : {
+                        "type" : "string",
+                        "description" : "",
+                        "nullable" : true
+                      },
+                      "retry" : {
+                        "type" : "object",
+                        "properties" : {
+                          "seconds" : {
+                            "type" : "integer",
+                            "description" : "The number of seconds in the duration.",
+                            "format" : "int64"
+                          },
+                          "nanos" : {
+                            "type" : "integer",
+                            "description" : "The number of nanoseconds in the duration, expressed as a fraction of the\nnumber of seconds. This is always positive, and never exceeds 999,999,999."
+                          }
+                        },
+                        "description" : "",
+                        "nullable" : true
+                      },
+                      "comment" : {
+                        "type" : "string",
+                        "description" : "",
+                        "nullable" : true
+                      },
+                      "data" : {
+                        "type" : "string",
+                        "description" : "",
+                        "nullable" : true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "java.time.Duration" : {
+        "type" : "object",
+        "properties" : {
+          "seconds" : {
+            "type" : "integer",
+            "description" : "The number of seconds in the duration.",
+            "format" : "int64"
+          },
+          "nanos" : {
+            "type" : "integer",
+            "description" : "The number of nanoseconds in the duration, expressed as a fraction of the\nnumber of seconds. This is always positive, and never exceeds 999,999,999."
+          }
+        },
+        "description" : "",
+        "nullable" : true
+      }
+    }
+  }
+}

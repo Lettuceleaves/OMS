@@ -89,6 +89,14 @@
             <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Maven Package -->
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -112,6 +120,36 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <!--设置将所有的依赖打进jar包中-->
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <!-- 此处指定main方法入口的class -->
+                            <mainClass>com.chen.Application</mainClass>
+                        </manifest>
+                    </archive>
+                    <!--指定打出的jar包输出目录-->
+                    <outputDirectory>E:\IdeaWorkspace\PinYinHelper1\target</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!--将assembly插件绑定到package上，到时只需要双击package指令即可-->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
