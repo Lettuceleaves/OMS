@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: run-file
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848

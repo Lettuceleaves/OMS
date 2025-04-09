@@ -26,6 +26,7 @@
         <module>api-gateway</module>
         <module>cloud-doc</module>
         <module>ai-chat</module>
+        <module>run-file</module>
     </modules>
     <scm>
         <connection/>
