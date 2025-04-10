@@ -58,7 +58,7 @@ public class dockerServiceApplication implements dockerServiceInterface {
         if (language == null || language.isEmpty()) throw new Exception("Language is empty");
 //        synchronized (service) { // 锁定 service
             try {
-                Path tempDirPath = Paths.get(System.getProperty("user.dir"), "docker-run");
+                Path tempDirPath = Paths.get(System.getProperty("user.dir"), "docker-run", UUID.randomUUID().toString());
                 String tempDir = tempDirPath.toString();
                 String cFilePath = tempDirPath.resolve(file.getOriginalFilename()).toString();
                 String outFilePath = tempDirPath.resolve("out.txt").toString();
@@ -79,7 +79,6 @@ public class dockerServiceApplication implements dockerServiceInterface {
                 if (!outFile.exists()) {
                     outFile.createNewFile(); // 创建文件
                 }
-                String dir = Paths.get(System.getProperty("user.dir"), "docker-run", UUID.randomUUID().toString()).toString();
 
                 ProcessBuilder processBuilder = commands.runSingleFileNoInput(language, file.getOriginalFilename(), tempDirPath.toString());
                 processBuilder.redirectErrorStream(true);
