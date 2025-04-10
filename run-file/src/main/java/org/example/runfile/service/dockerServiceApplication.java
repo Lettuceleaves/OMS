@@ -1,6 +1,7 @@
 package org.example.runfile.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class dockerServiceApplication implements dockerServiceInterface {
-    // 单例实例
-    private static volatile dockerServiceApplication instance;
 
     @Autowired
     private commandsInterface commands;
@@ -33,21 +32,6 @@ public class dockerServiceApplication implements dockerServiceInterface {
 
     private static final services service = new services();
 
-    // 私有构造函数，防止外部直接实例化
-    private dockerServiceApplication() {}
-
-    // 提供一个公共的静态方法来获取单例实例
-    public static dockerServiceApplication getInstance() {
-        if (instance == null) {
-            synchronized (dockerServiceApplication.class) { // 双重检查锁定
-                if (instance == null) {
-                    instance = new dockerServiceApplication();
-                }
-            }
-        }
-        return instance;
-    }
-
     // 添加新镜像
     public void addNewImage(String language) {
         if (services.status.containsKey(language)) return;
@@ -56,9 +40,8 @@ public class dockerServiceApplication implements dockerServiceInterface {
                 ProcessBuilder processBuilder = commands.buildImage(language);
                 processBuilder.redirectErrorStream(true);
                 Process process = processBuilder.start();
-                if (process.waitFor(2, TimeUnit.MINUTES)) {
-                    throw new Exception("Docker build timed out");
-                }
+                int exitCode = process.waitFor();
+                System.out.println(exitCode);
                 services.images.put(language, new HashMap<>());
                 services.status.put(language, 0);
             } catch (Exception e) {
@@ -70,12 +53,13 @@ public class dockerServiceApplication implements dockerServiceInterface {
     // 移除镜像 TODO
 
     // 运行单个文件，无输入
+    @Async
     public String runSingleFileNoInput(String language, MultipartFile file) throws Exception {
         if (language == null || language.isEmpty()) throw new Exception("Language is empty");
-        synchronized (service) { // 锁定 service
+//        synchronized (service) { // 锁定 service
             try {
                 Path tempDirPath = Paths.get(System.getProperty("user.dir"), "docker-run");
-                // String tempDir = tempDirPath.toString();
+                String tempDir = tempDirPath.toString();
                 String cFilePath = tempDirPath.resolve(file.getOriginalFilename()).toString();
                 String outFilePath = tempDirPath.resolve("out.txt").toString();
 
@@ -95,8 +79,9 @@ public class dockerServiceApplication implements dockerServiceInterface {
                 if (!outFile.exists()) {
                     outFile.createNewFile(); // 创建文件
                 }
+                String dir = Paths.get(System.getProperty("user.dir"), "docker-run", UUID.randomUUID().toString()).toString();
 
-                ProcessBuilder processBuilder = commands.runSingleFileNoInput(language, file.getOriginalFilename(), "docker-run");
+                ProcessBuilder processBuilder = commands.runSingleFileNoInput(language, file.getOriginalFilename(), tempDirPath.toString());
                 processBuilder.redirectErrorStream(true);
                 Process process = processBuilder.start();
 
@@ -117,13 +102,26 @@ public class dockerServiceApplication implements dockerServiceInterface {
                 System.out.println("->" + result + "<-");
 
                 // 删除临时目录
-//            deleteDirectory(tempDir);
+                deleteDirectory(tempDir);
 
                 return result;
             } catch (Exception e) {
                 System.out.println("Error running single file: " + e.getMessage());
             }
-        }
+        // }
         return "Success";
+    }
+
+    private void deleteDirectory(String directoryPath) throws IOException {
+        File directory = new File(directoryPath);
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+            directory.delete();
+        }
     }
 }

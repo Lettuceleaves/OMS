@@ -47,8 +47,14 @@ public class controllerApplication {
         return service.singleTest(testFile, inFile);
     }
 
-    @GetMapping("/runFile/singleTestNoInput")
+    @PostMapping("/runFile/singleTestNoInput")
     String singleTestNoInput(@RequestParam("language") String language, @RequestParam("inFile") MultipartFile inFile) throws Exception {
         return dockerService.runSingleFileNoInput(language, inFile);
+    }
+
+    @GetMapping("/runFile/addNewImage/{language}")
+    String addNewImage(@PathVariable("language") String language) throws Exception {
+        dockerService.addNewImage(language);
+        return "add new image success";
     }
 }
