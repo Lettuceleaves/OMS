@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.io.IOException;
 
 @RestController
@@ -19,7 +20,8 @@ public class controllerApplication {
     private dockerServiceInterface dockerService;
 
     @GetMapping("hello")
-    String hello() {
+    String hello() throws InterruptedException {
+        Thread.sleep(1000);
         return "Hello World!";
     }
 
@@ -48,8 +50,8 @@ public class controllerApplication {
     }
 
     @PostMapping("/runFile/singleTestNoInput")
-    String singleTestNoInput(@RequestParam("language") String language, @RequestParam("inFile") MultipartFile inFile) throws Exception {
-        return dockerService.runSingleFileNoInput(language, inFile);
+    String singleTestNoInput(@RequestParam("language") String language, @RequestParam("inFile") MultipartFile inFile, @RequestParam("answer") MultipartFile ans) throws Exception {
+        return dockerService.runSingleFileNoInput(language, inFile, ans);
     }
 
     @GetMapping("/runFile/addNewImage/{language}")

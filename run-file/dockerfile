@@ -16,4 +16,3 @@ WORKDIR /app
 
 # sudo docker run --rm a
 # sudo docker build --progress=plain --no-cache -t a run-file
-
