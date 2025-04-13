@@ -86,10 +86,10 @@ public class dockerServiceApplication implements dockerServiceInterface {
     }
 
     // 运行单个文件，无输入
-    public String runSingleFileNoInput(String language, MultipartFile file, MultipartFile ans) throws Exception {
+    public String runSingleFileNoInput(String language, MultipartFile file, MultipartFile ans, Path tempDirPath, int mode) throws Exception {
         if (language == null || language.isEmpty()) throw new Exception("Language is empty");
         try {
-            Path tempDirPath = Paths.get(System.getProperty("user.dir"), "run-file", UUID.randomUUID().toString());
+            // Path tempDirPath = Paths.get(System.getProperty("user.dir"), "run-file", UUID.randomUUID().toString());
             String tempDir = tempDirPath.toString();
             String cFilePath = tempDirPath.resolve("test" + '.' + language).toString();
             String monitorFilePath = tempDirPath.resolve("monitor.c").toString();
@@ -129,18 +129,21 @@ public class dockerServiceApplication implements dockerServiceInterface {
                 throw new IOException("Output file not found: " + outFilePath);
             }
 
-            String result = new String(Files.readAllBytes(Paths.get(outFilePath))).replace("\r\n", "\n").trim();
-            String ansString = new String(ans.getBytes()).replace("\r\n", "\n").trim();
-            if (result.equals(ansString)) {
-                result = "Accept";
-            } else {
-                System.out.println(result);
-                System.out.println(ansString);
-                result = "Wrong Answer\n" + result;
-            }
+            String result = new String();
+            if (mode == 1) {
+                result = new String(Files.readAllBytes(Paths.get(outFilePath))).replace("\r\n", "\n").trim();
+                String ansString = new String(ans.getBytes()).replace("\r\n", "\n").trim();
+                if (result.equals(ansString)) {
+                    result = "Accept";
+                } else {
+                    System.out.println(result);
+                    System.out.println(ansString);
+                    result = "Wrong Answer\n" + result;
+                }
 
-            // 删除临时目录
-            deleteDirectory(tempDir);
+                // 删除临时目录
+                deleteDirectory(tempDir);
+            }
 
             return result;
         } catch (Exception e) {
