@@ -91,13 +91,20 @@ public class dockerServiceApplication implements dockerServiceInterface {
         try {
             Path tempDirPath = Paths.get(System.getProperty("user.dir"), "run-file", UUID.randomUUID().toString());
             String tempDir = tempDirPath.toString();
-            String cFilePath = tempDirPath.resolve(file.getOriginalFilename()).toString();
+            String cFilePath = tempDirPath.resolve("test" + '.' + language).toString();
+            String monitorFilePath = tempDirPath.resolve("monitor.c").toString();
 
             // 创建临时目录
             Files.createDirectories(tempDirPath);
 
             // 保存上传的文件
             file.transferTo(new File(cFilePath));
+
+            // 把当前路径下的monitor.c文件复制到临时目录
+            File monitorFile = new File(monitorFilePath);
+            if (!monitorFile.exists()) {
+                Files.copy(Paths.get(System.getProperty("user.dir"), "run-file", "monitor.c"), monitorFile.toPath());
+            }
 
             // 检查文件是否正确上传
             if (!new File(cFilePath).exists()) {
@@ -127,6 +134,8 @@ public class dockerServiceApplication implements dockerServiceInterface {
             if (result.equals(ansString)) {
                 result = "Accept";
             } else {
+                System.out.println(result);
+                System.out.println(ansString);
                 result = "Wrong Answer\n" + result;
             }
 

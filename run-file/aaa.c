@@ -7,7 +7,7 @@ int main() {
     printf("0\n");
     for (int i = 1; i <= 1000; i++) {
         c = a + b;
-        if (c > 10000 {
+        if (c > 1000) {
             break;
         }
         printf("%ld\n", c);

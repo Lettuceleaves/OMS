@@ -26,6 +26,74 @@ int compare(const void* a, const void* b) {
     return num1 - num2;
 }
 
+// 执行test程序的通用函数
+int execute_test_program(FILE* infile, FILE* outfile, int timeout, const char* filename) {
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        fprintf(outfile, "创建子进程失败\n");
+        return -1;
+    } else if (pid == 0) {
+        // 子进程
+        // 重定向标准输入和标准输出
+        if (infile) {
+            dup2(fileno(infile), STDIN_FILENO);
+        }
+        dup2(fileno(outfile), STDOUT_FILENO);
+
+        // 执行test程序
+        execlp("./test", "test", NULL);
+        perror("execlp");
+        exit(1); // 如果execlp失败，退出子进程
+    } else {
+        // 父进程
+        // 设置超时信号处理
+        signal(SIGALRM, handle_alarm);
+        alarm(timeout);
+
+        // 等待子进程结束
+        int status;
+        pid_t ret = waitpid(pid, &status, 0);
+        alarm(0); // 取消超时信号
+
+        if (ret == -1) {
+            perror("waitpid");
+            fprintf(outfile, "等待子进程失败\n");
+            return -1;
+        }
+
+        if (WIFEXITED(status)) {
+            int exit_code = WEXITSTATUS(status);
+            if (exit_code == 0) {
+                if (filename) {
+                    printf("文件%s处理成功\n", filename);
+                } else {
+                    printf("test程序直接执行成功\n");
+                }
+            } else {
+                if (filename) {
+                    fprintf(outfile, "文件%s处理失败，退出码：%d\n", filename, exit_code);
+                    printf("文件%s处理失败，退出码：%d\n", filename, exit_code);
+                } else {
+                    fprintf(outfile, "test程序直接执行失败，退出码：%d\n", exit_code);
+                    printf("test程序直接执行失败，退出码：%d\n", exit_code);
+                }
+                return -1;
+            }
+        } else if (WIFSIGNALED(status)) {
+            if (filename) {
+                fprintf(outfile, "文件%s处理失败，被信号%d终止\n", filename, WTERMSIG(status));
+                printf("文件%s处理失败，被信号%d终止\n", filename, WTERMSIG(status));
+            } else {
+                fprintf(outfile, "test程序直接执行失败，被信号%d终止\n", WTERMSIG(status));
+                printf("test程序直接执行失败，被信号%d终止\n", WTERMSIG(status));
+            }
+            return -1;
+        }
+    }
+    return 0;
+}
+
 int main() {
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -75,6 +143,21 @@ int main() {
         perror("popen");
         return 1;
     }
+    // 如果没有输入文件，就直接执行test程序一次
+    if (fgets(filenames[0], MAX_FILENAME_LENGTH, fp) == NULL) {
+        printf("没有找到以'in'开头的输入文件，直接执行test程序\n");
+        fclose(fp);
+
+        // 直接执行test程序
+        if (execute_test_program(NULL, outfile, timeout, NULL) != 0) {
+            fclose(outfile);
+            return 1;
+        }
+
+        printf("所有文件处理完成\n");
+        fclose(outfile);
+        return 0;
+    }
     char filename[MAX_FILENAME_LENGTH];
     while (fgets(filename, MAX_FILENAME_LENGTH, fp)) {
         filename[strcspn(filename, "\n")] = '\0'; // 去掉换行符
@@ -98,64 +181,14 @@ int main() {
             return 1;
         }
 
-        // 创建子进程运行test程序
-        pid_t pid = fork();
-        if (pid == -1) {
-            perror("fork");
-            fprintf(outfile, "创建子进程失败\n");
+        // 执行test程序
+        if (execute_test_program(infile, outfile, timeout, filenames[i]) != 0) {
             fclose(infile);
             fclose(outfile);
             return 1;
-        } else if (pid == 0) {
-            // 子进程
-            // 重定向标准输入和标准输出
-            dup2(fileno(infile), STDIN_FILENO);
-            dup2(fileno(outfile), STDOUT_FILENO);
-
-            // 执行test程序
-            execlp("./test", "test", NULL);
-            perror("execlp");
-            exit(1); // 如果execlp失败，退出子进程
-        } else {
-            // 父进程
-            // 设置超时信号处理
-            signal(SIGALRM, handle_alarm);
-            alarm(timeout);
-
-            // 等待子进程结束
-            int status;
-            pid_t ret = waitpid(pid, &status, 0);
-            alarm(0); // 取消超时信号
-
-            if (ret == -1) {
-                perror("waitpid");
-                fprintf(outfile, "等待子进程失败\n");
-                fclose(infile);
-                fclose(outfile);
-                return 1;
-            }
-
-            if (WIFEXITED(status)) {
-                int exit_code = WEXITSTATUS(status);
-                if (exit_code == 0) {
-                    printf("文件%s处理成功\n", filenames[i]);
-                } else {
-                    fprintf(outfile, "文件%s处理失败，退出码：%d\n", filenames[i], exit_code);
-                    printf("文件%s处理失败，退出码：%d\n", filenames[i], exit_code);
-                    fclose(infile);
-                    fclose(outfile);
-                    return 1;
-                }
-            } else if (WIFSIGNALED(status)) {
-                fprintf(outfile, "文件%s处理失败，被信号%d终止\n", filenames[i], WTERMSIG(status));
-                printf("文件%s处理失败，被信号%d终止\n", filenames[i], WTERMSIG(status));
-                fclose(infile);
-                fclose(outfile);
-                return 1;
-            }
-
-            fclose(infile); // 关闭输入文件
         }
+
+        fclose(infile); // 关闭输入文件
     }
 
     printf("所有文件处理完成\n");
