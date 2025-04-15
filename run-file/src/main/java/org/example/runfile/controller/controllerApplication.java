@@ -9,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.desktop.SystemSleepEvent;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @RestController
 public class controllerApplication {
@@ -51,7 +53,7 @@ public class controllerApplication {
 
     @PostMapping("/runFile/singleTestNoInput")
     String singleTestNoInput(@RequestParam("language") String language, @RequestParam("inFile") MultipartFile inFile, @RequestParam("answer") MultipartFile ans) throws Exception {
-        return dockerService.runSingleFileNoInput(language, inFile, ans);
+        return dockerService.runSingleFileNoInput(language, inFile, ans, Paths.get(System.getProperty("user.dir"), "run-file", UUID.randomUUID().toString()), 1);
     }
 
     @GetMapping("/runFile/addNewImage/{language}")

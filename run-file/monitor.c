@@ -6,17 +6,15 @@
 #include <time.h>
 #include <errno.h>
 #include <signal.h>
+#include <dirent.h>
 
 #define MAX_FILENAME_LENGTH 256
 #define MAX_LINE_LENGTH 1024
 
-// 用于处理子进程超时的信号处理函数
 void handle_alarm(int sig) {
-    // 如果收到SIGALRM信号，说明子进程超时了
-    // 这里不需要做任何处理，因为父进程会检测到子进程状态异常
+    // 超时处理函数
 }
 
-// 比较函数，用于对文件名按数字排序
 int compare(const void* a, const void* b) {
     const char* str1 = *(const char**)a;
     const char* str2 = *(const char**)b;
@@ -26,7 +24,6 @@ int compare(const void* a, const void* b) {
     return num1 - num2;
 }
 
-// 执行test程序的通用函数
 int execute_test_program(FILE* infile, FILE* outfile, int timeout, const char* filename) {
     pid_t pid = fork();
     if (pid == -1) {
@@ -34,60 +31,31 @@ int execute_test_program(FILE* infile, FILE* outfile, int timeout, const char* f
         fprintf(outfile, "创建子进程失败\n");
         return -1;
     } else if (pid == 0) {
-        // 子进程
-        // 重定向标准输入和标准输出
-        if (infile) {
-            dup2(fileno(infile), STDIN_FILENO);
-        }
+        if (infile) dup2(fileno(infile), STDIN_FILENO);
         dup2(fileno(outfile), STDOUT_FILENO);
-
-        // 执行test程序
         execlp("./test", "test", NULL);
         perror("execlp");
-        exit(1); // 如果execlp失败，退出子进程
+        exit(1);
     } else {
-        // 父进程
-        // 设置超时信号处理
         signal(SIGALRM, handle_alarm);
         alarm(timeout);
-
-        // 等待子进程结束
         int status;
         pid_t ret = waitpid(pid, &status, 0);
-        alarm(0); // 取消超时信号
+        alarm(0);
 
         if (ret == -1) {
             perror("waitpid");
-            fprintf(outfile, "等待子进程失败\n");
             return -1;
         }
 
         if (WIFEXITED(status)) {
             int exit_code = WEXITSTATUS(status);
-            if (exit_code == 0) {
-                if (filename) {
-                    printf("文件%s处理成功\n", filename);
-                } else {
-                    printf("test程序直接执行成功\n");
-                }
-            } else {
-                if (filename) {
-                    fprintf(outfile, "文件%s处理失败，退出码：%d\n", filename, exit_code);
-                    printf("文件%s处理失败，退出码：%d\n", filename, exit_code);
-                } else {
-                    fprintf(outfile, "test程序直接执行失败，退出码：%d\n", exit_code);
-                    printf("test程序直接执行失败，退出码：%d\n", exit_code);
-                }
+            if (exit_code != 0) {
+                fprintf(outfile, "文件%s处理失败，退出码：%d\n", filename, exit_code);
                 return -1;
             }
         } else if (WIFSIGNALED(status)) {
-            if (filename) {
-                fprintf(outfile, "文件%s处理失败，被信号%d终止\n", filename, WTERMSIG(status));
-                printf("文件%s处理失败，被信号%d终止\n", filename, WTERMSIG(status));
-            } else {
-                fprintf(outfile, "test程序直接执行失败，被信号%d终止\n", WTERMSIG(status));
-                printf("test程序直接执行失败，被信号%d终止\n", WTERMSIG(status));
-            }
+            fprintf(outfile, "文件%s处理失败，被信号%d终止\n", filename, WTERMSIG(status));
             return -1;
         }
     }
@@ -95,103 +63,75 @@ int execute_test_program(FILE* infile, FILE* outfile, int timeout, const char* f
 }
 
 int main() {
-    char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("当前工作目录：%s\n", cwd);
-    } else {
-        perror("getcwd");
-    }
-    int timeout; // 超时时间
-    printf("请输入超时时间（秒）：");
-    scanf("%d", &timeout);
+    int timeout;
+    // printf("请输入超时时间（秒）：");
+    // scanf("%d", &timeout);
+    timeout = 10;
 
-    // 打开输出文件
     FILE* outfile = fopen("out.txt", "w");
-    if (outfile == NULL) {
+    if (!outfile) {
         perror("fopen");
         return 1;
     }
 
-    // 尝试编译test.c文件
-    printf("正在尝试编译test.c文件...\n");
+    // 编译test.c
+    printf("正在编译test.c...\n");
     FILE* compile_fp = popen("gcc -o test test.c 2>&1", "r");
-    if (compile_fp == NULL) {
+    if (!compile_fp) {
         perror("popen");
-        fprintf(outfile, "无法执行gcc编译test.c文件\n");
+        fprintf(outfile, "编译失败\n");
         fclose(outfile);
         return 1;
     }
+    
     char compile_output[MAX_LINE_LENGTH];
-    while (fgets(compile_output, MAX_LINE_LENGTH, compile_fp)) {
+    while (fgets(compile_output, sizeof(compile_output), compile_fp)) {
         fprintf(outfile, "%s", compile_output);
     }
     pclose(compile_fp);
 
-    // 检查test程序是否存在
     if (access("./test", X_OK) != 0) {
-        fprintf(outfile, "test程序编译失败或不存在，无法继续处理文件\n");
-        printf("test程序编译失败或不存在，无法继续处理文件\n");
+        fprintf(outfile, "test程序不可执行\n");
         fclose(outfile);
         return 1;
     }
 
-    // 获取当前目录下的所有以"in"开头的文件名
-    char* filenames[1000]; // 假设最多有1000个输入文件
-    int count = 0;
-    FILE* fp = popen("ls in* 2>/dev/null", "r");
-    if (fp == NULL) {
-        perror("popen");
-        return 1;
-    }
-    // 如果没有输入文件，就直接执行test程序一次
-    if (fgets(filenames[0], MAX_FILENAME_LENGTH, fp) == NULL) {
-        printf("没有找到以'in'开头的输入文件，直接执行test程序\n");
-        fclose(fp);
+    // 收集输入文件
+    DIR *dir = opendir(".");
+    char **input_files = NULL;
+    int num_files = 0;
+    struct dirent *entry;
 
-        // 直接执行test程序
-        if (execute_test_program(NULL, outfile, timeout, NULL) != 0) {
-            fclose(outfile);
-            return 1;
+    while ((entry = readdir(dir)) != NULL) {
+        if (strncmp(entry->d_name, "in", 2) == 0) {
+            input_files = realloc(input_files, (num_files + 1) * sizeof(char*));
+            input_files[num_files] = strdup(entry->d_name);
+            num_files++;
         }
-
-        printf("所有文件处理完成\n");
-        fclose(outfile);
-        return 0;
     }
-    char filename[MAX_FILENAME_LENGTH];
-    while (fgets(filename, MAX_FILENAME_LENGTH, fp)) {
-        filename[strcspn(filename, "\n")] = '\0'; // 去掉换行符
-        filenames[count++] = strdup(filename);
-    }
-    pclose(fp);
+    closedir(dir);
+    qsort(input_files, num_files, sizeof(char*), compare);
 
-    // 按数字排序
-    qsort(filenames, count, sizeof(char*), compare);
-
-    // 遍历所有输入文件
-    for (int i = 0; i < count; i++) {
-        printf("正在处理文件：%s\n", filenames[i]);
-
-        // 打开输入文件
-        FILE* infile = fopen(filenames[i], "r");
-        if (infile == NULL) {
-            perror("fopen");
-            fprintf(outfile, "无法打开输入文件：%s\n", filenames[i]);
-            fclose(outfile);
-            return 1;
-        }
-
-        // 执行test程序
-        if (execute_test_program(infile, outfile, timeout, filenames[i]) != 0) {
+    if (num_files > 0) {
+        for (int i = 0; i < num_files; i++) {
+            printf("正在处理文件：%s\n", input_files[i]);
+            FILE* infile = fopen(input_files[i], "r");
+            if (!infile) {
+                fprintf(outfile, "无法打开%s\n", input_files[i]);
+                free(input_files[i]);
+                continue;
+            }
+            execute_test_program(infile, outfile, timeout, input_files[i]);
             fclose(infile);
-            fclose(outfile);
-            return 1;
+            free(input_files[i]);
         }
-
-        fclose(infile); // 关闭输入文件
+        free(input_files);
+    } else {
+        printf("无输入文件，直接执行test\n");
+        execute_test_program(NULL, outfile, timeout, NULL);
     }
 
-    printf("所有文件处理完成\n");
-    fclose(outfile); // 关闭输出文件
+    fclose(outfile);
+    printf("处理完成\n");
     return 0;
 }

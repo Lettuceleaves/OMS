@@ -39,7 +39,7 @@ public class dockerServiceApplication implements dockerServiceInterface {
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
-            System.out.println(exitCode);
+            System.out.println("Success_exitcode:" + exitCode);
             images.put(language, new HashMap<>());
         } catch (Exception e) {
             System.out.println("Error building image: " + e.getMessage());
@@ -53,6 +53,7 @@ public class dockerServiceApplication implements dockerServiceInterface {
     public void registerRunDocker(String language) {
         lock.lock();
         if (!status.containsKey(language)) {
+            System.out.println("New image registered: " + language);
             addNewImage(language);
         }
         int state = status.getOrDefault(language, 0);
@@ -60,17 +61,16 @@ public class dockerServiceApplication implements dockerServiceInterface {
         lock.unlock();
     }
 
-    // 运行销毁
+    // 运行注册信息销毁
 
     public void deleteRunDocker(String language) {
         lock.lock();
         int state = status.getOrDefault(language, 0);
         if (state == 0) System.out.println("Error in delete");
-        status.put(language, state - 1);
         if (state == 1) {
-            status.remove(language);
             // 启动定时器 TODO
         }
+        status.put(language, state - 1);
         lock.unlock();
     }
 
@@ -85,7 +85,7 @@ public class dockerServiceApplication implements dockerServiceInterface {
         return outFilePath;
     }
 
-    // 运行单个文件，无输入
+    // 运行单个文件，有输入
     public String runSingleFileNoInput(String language, MultipartFile file, MultipartFile ans, Path tempDirPath, int mode) throws Exception {
         if (language == null || language.isEmpty()) throw new Exception("Language is empty");
         try {
@@ -97,6 +97,17 @@ public class dockerServiceApplication implements dockerServiceInterface {
             // 创建临时目录
             Files.createDirectories(tempDirPath);
 
+            if (mode == 1) {
+                // 给当前目录下的run-file文件夹中所有in开头的文件也上传到临时目录
+                File[] files = new File(System.getProperty("user.dir"), "run-file").listFiles((dir, name) -> name.startsWith("in"));
+                if (files != null) {
+                    for (File f : files) {
+                        String fileName = f.getName();
+                        String filePath = tempDirPath.resolve(fileName).toString();
+                        Files.copy(f.toPath(), Paths.get(filePath));
+                    }
+                }
+            }
             // 保存上传的文件
             file.transferTo(new File(cFilePath));
 
@@ -136,13 +147,13 @@ public class dockerServiceApplication implements dockerServiceInterface {
                 if (result.equals(ansString)) {
                     result = "Accept";
                 } else {
-                    System.out.println(result);
-                    System.out.println(ansString);
+//                    System.out.println(result);
+//                    System.out.println(ansString);
                     result = "Wrong Answer\n" + result;
                 }
 
-                // 删除临时目录
-                deleteDirectory(tempDir);
+                 // 删除临时目录
+                 deleteDirectory(tempDir);
             }
 
             return result;
