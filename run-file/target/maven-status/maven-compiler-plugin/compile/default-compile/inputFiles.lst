@@ -1,4 +1,8 @@
 E:\projects\OMS\run-file\src\main\java\org\example\runfile\controller\controllerApplication.java
 E:\projects\OMS\run-file\src\main\java\org\example\runfile\runFileApplication.java
-E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\serviceApplication.java
-E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\serviceInterface.java
+E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\checkFileApplication.java
+E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\checkFileInterface.java
+E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\commandsApplication.java
+E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\commandsInterface.java
+E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\dockerServiceApplication.java
+E:\projects\OMS\run-file\src\main\java\org\example\runfile\service\dockerServiceInterface.java

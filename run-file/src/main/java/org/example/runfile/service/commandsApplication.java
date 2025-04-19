@@ -9,6 +9,7 @@ public class commandsApplication implements commandsInterface {
 
     public ProcessBuilder runSingleFileNoInputWin(String language, String file, String directory) {
         // Windows系统
+        System.out.println(directory);
         String command = "docker run -v " + directory + ":/app " + language + " sh -c \"ls && cd /app && echo 'Starting compilation...' && ls && gcc monitor.c -o mon && ./mon\"";
         ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", command);
         System.out.println(command);

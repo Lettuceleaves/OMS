@@ -1,4 +1,8 @@
+org\example\runfile\service\checkFileInterface.class
+org\example\runfile\service\commandsInterface.class
+org\example\runfile\service\dockerServiceApplication.class
+org\example\runfile\service\commandsApplication.class
+org\example\runfile\service\dockerServiceInterface.class
 org\example\runfile\runFileApplication.class
-org\example\runfile\service\serviceApplication.class
-org\example\runfile\service\serviceInterface.class
 org\example\runfile\controller\controllerApplication.class
+org\example\runfile\service\checkFileApplication.class
