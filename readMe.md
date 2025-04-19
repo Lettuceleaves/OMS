@@ -1,10 +1,11 @@
 **=w=**
 
-deb http://deb.debian.org/debian/ bookworm main
-deb-src http://deb.debian.org/debian/ bookworm main
+瞎写的项目。。。
+包含了一个线上oj
+但是。。。非常潦草，远远到不了上线的程度
 
-deb http://security.debian.org/debian-security bookworm-security main
-deb-src http://security.debian.org/debian-security bookworm-security main
-
-deb http://deb.debian.org/debian/ bookworm-updates main
-deb-src http://deb.debian.org/debian/ bookworm-updates main
+// docker启动检测bug TODO
+// 删改查 TODO
+// 判题限时 TODO
+// 判题响应文字限时显示 TODO
+// 权限管理 TODO
